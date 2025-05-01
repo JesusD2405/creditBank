@@ -47,6 +47,7 @@ BASE_APPS = [
 
 LOCAL_APPS = [
     'api.apps.ApiConfig',
+    'apps.base.apps.BaseConfig',
 ]
 
 THIRD_APPS = [
