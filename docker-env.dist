@@ -1,0 +1,28 @@
+###< Docker ###
+PROJECT_NAME=creditBank
+
+EXTERNAL_API_PORT=8000
+EXTERNAL_DEBUG_PORT=8200
+
+###> Django ###
+DEBUG=false # true ONLY DEV
+ALLOWED_HOSTS=127.0.0.1|localhost
+ENABLE_MIGRATIONS=false
+RUN_MODE=DEV # DEV | PROD
+GUNICORN_WORKERS=2 # REF: https://docs.gunicorn.org/en/latest/design.html#how-many-workers
+
+###< Email ###
+EMAIL_USE_TLS=true
+EMAIL_USE_SSL=false
+EMAIL_HOST=
+EMAIL_FROM=
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+EMAIL_PORT=
+
+###< Database ###
+DB_HOST=creditBank-db
+DB_PORT=5432
+DB_NAME=creditBank
+DB_USER=creditBank
+DB_PASSWORD=creditBank
