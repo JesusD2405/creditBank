@@ -10,7 +10,7 @@ schema_view = get_schema_view(
    openapi.Info(
       title="Credit Bank API",
       default_version='v1',
-      description="API para gestión de procesos de ....",
+      description="API para gestión de procesos bancarios",
       contact=openapi.Contact(email="jesusdavid2405@gmail.com"),
     #   terms_of_service="https://www.google.com/policies/terms/",
     #   license=openapi.License(name="BSD License"),

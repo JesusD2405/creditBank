@@ -1,6 +1,6 @@
 # Credit Bank
 
-_Proyecto en Django Rest Framework, que contiene el desarrollo de una App Web Rest Full para gestión de los procesos de ....._
+_Proyecto en Django Rest Framework, que contiene el desarrollo de una App Web para gestión de los procesos bancarios._
 
 ## Comenzando 🚀
 
