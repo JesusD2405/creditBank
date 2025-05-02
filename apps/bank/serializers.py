@@ -5,7 +5,7 @@ from .models import *
 
 # Banco
 class BankSerializer(serializers.ModelSerializer):
-    id = serializers.UUIDField()
+    id = serializers.UUIDField(read_only=True)
 
     class Meta:
         model = Bank
