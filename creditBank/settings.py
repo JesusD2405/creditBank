@@ -47,6 +47,10 @@ BASE_APPS = [
 
 LOCAL_APPS = [
     'api.apps.ApiConfig',
+    'apps.base.apps.BaseConfig',
+    'apps.client.apps.ClientConfig',
+    'apps.credit.apps.CreditConfig',
+    'apps.bank.apps.BankConfig',
 ]
 
 THIRD_APPS = [
@@ -279,6 +283,11 @@ LOGGING = {
     },
     'loggers': {
         'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'apps.auth2.views': {
             'handlers': ['file'],
             'level': 'INFO',
             'propagate': True,

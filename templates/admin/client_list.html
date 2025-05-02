@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+{% block title %}Listado de Clientes | ADMIN{% endblock title%}
+{% block navbar %}
+  {% include '../components/navbar.html' %}
+{% endblock navbar %}
+
+{% block content %}
+<!-- Datatable -->
+<div class="container pt-5">
+  <div class="card">
+    <div class="card-header d-flex d-flex flex-column flex-md-row justify-content-between align-items-end">
+      <div class="d-flex">
+        <h3>Listado de Clientes</h3>
+        <button id="btnFormLabel" class="btn btn-sm btn-success mx-2" type="button" data-bs-toggle="modal" data-bs-target="#formClientModal">
+          <i class="fa fa-plus"></i>
+        </button>
+      </div>
+      <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12 d-flex align-items-end mt-2">
+        <input type="text" name="search" id="search" class="form-control mb-2" placeholder="BUSCAR" onkeyup="filterBySearch()">
+      </div>
+    </div>
+  </div>
+  <div class="mt-2 table-responsive p-x1 text-center bg-white border shadow-sm rounded-2 mb-2">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Cliente</th>
+          <th scope="col">Tipo de Persona</th>
+          <th scope="col">Nacionalidad</th>
+          <th scope="col">Género</th>
+          <th scope="col">Correo Eléctronico</th>
+          <th scope="col">Fecha de Nacimiento</th>
+          <th scope="col">Télefono</th>
+          <th scope="col">Dirección</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="table-clients">
+      </tbody>
+    </table>
+    </div>
+    <nav>
+      <ul id="tablePaginate" class=" d-flex justify-content-center pagination">
+      </ul>
+    </nav>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="formClientModal" >
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header text-center p-2">
+        <div class="d-flex justify-content-center">
+          <h1 class="modal-title fs-5" id="formLabel"></h1>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-5 pt-3 pb-3">
+        <form id="formClient" class="row" name="formClient">
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="full_name" class="form-label fw-bold fs-6">Nombre y Apellido</label>
+            <input id="full_name" name="full_name" type="text" class="form-control fs-6" required>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="birth_date" class="form-label fw-bold fs-6">Fecha de Nacimiento</label>
+            <input id="birth_date" name="birth_date" type="date" class="form-control fs-6" required>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="nationality" class="form-label fw-bold fs-6">Nacionalidad</label>
+            <input id="nationality" name="nationality" type="text" class="form-control fs-6">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="address" class="form-label fw-bold fs-6">Dirección</label>
+            <input id="address" name="address" type="text" class="form-control fs-6">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="email" class="form-label fw-bold fs-6">Correo Electrónico</label>
+            <input id="email" name="email" type="email" class="form-control fs-6" required>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="phone" class="form-label fw-bold fs-6">Teléfono</label>
+            <div class="d-flex">
+              <select name="phone_prefix" id="phone_prefix" class="form-select form-control" aria-label="-- Seleccione --" style="width: 100px;">
+                <option value="" disabled>-- Seleccione --</option>
+                <option value="+1">+1</option>
+                <option value="+34">+34</option>
+                <option value="+58">+58</option>
+                <option value="+507">+507</option>
+              </select>
+              <input id="phone" name="phone" type="phone" class="form-control fs-6">
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="gender" class="form-label fw-bold">Género</label>
+            <select name="gender" id="gender" class="form-select form-control mb-2" aria-label="-- Seleccione --" required>
+              <option value="" disabled>-- Seleccione --</option>
+              <option value="M">MASCULINO</option>
+              <option value="F">FEMENINO</option>
+            </select>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="person_type" class="form-label fw-bold">Tipo de Persona</label>
+            <select name="person_type" id="person_type" class="form-select form-control mb-2" aria-label="Seleccione un tipo de documento" required>
+              <option value="" disabled>-- Seleccione --</option>
+              <option value="N">NATURAL</option>
+              <option value="J">JURIDICO</option>
+            </select>
+          </div>
+          <div class="d-flex flex-row justify-content-around mt-5">
+            <button id="btnFormLabel" type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+
+  let currentClients = [];
+  let isClientEdit = false;
+  let clientId = null;
+
+  const PERSON_TYPE = {
+    "N": "NATURAL",
+    "J": "JURIDICA",
+  }
+
+  const GENDER = {
+    "M": "MASCULINO",
+    "F": "FEMENINO",
+  }
+
+  const showModal = (openModal) => {
+    const myModalEl = document.getElementById('formClientModal');
+    let modal = bootstrap.Modal.getInstance(myModalEl) || new bootstrap.Modal(myModalEl);
+
+    if (openModal) {
+      modal.show();  
+    } else {
+      modal.hide();
+    }
+  }
+
+  const getClients = (url) => {
+    // spinner(true);
+    url = url.includes("http://") && !url.includes("localhost") ? url.replace("http://", "https://") : url;
+    $.ajax({
+      type: "GET",
+      url,
+      dataType: 'json',
+      contentType: 'application/json',
+      success: (res) => {
+        console.log("-- res ", res);
+        setTable(res);
+        setPagination(res);
+      },
+      error: (err) => {
+        console.error(err.responseJSON)
+      },
+      complete: (_) => {
+        // spinner(false);
+      }
+    });
+  }
+  getClients("/api/clients/");
+
+  const openFormEdit = (id) => {
+    const client = currentClients.find((data) => data.id === id);
+
+    if (client) {
+      $('#full_name').val(client.full_name);
+      $('#birth_date').val(client.birth_date);
+      $('#nationality').val(client.nationality);
+      $('#address').val(client.address);
+      $('#email').val(client.email);
+      $('#phone_prefix').val(client.phone_prefix);
+      $('#phone').val(client.phone);
+      $('#gender').val(client.gender);
+      $('#person_type').val(client.person_type);
+
+      clientId = client.id;
+      isClientEdit = true;
+      showModal(true);
+    }
+  }
+
+  const remove = (id) => {
+    const client = currentClients.find((data) => data.id === id);
+
+    Swal.fire({
+      title: `¿Está seguro de eliminar el cliente "${ client.full_name}"?`,
+      text: '',
+      icon: 'warning',
+      confirmButtonText: 'Confirmar',
+      cancelButtonText: 'Cancelar',
+      showCancelButton: true,
+      showCloseButton: true,
+      customClass: {
+        closeButton: "bg-danger",
+        cancelButton: "bg-danger",
+        confirmButton: "bg-success"
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          type: "DELETE",
+          url: `/api/clients/${id}/`,
+          dataType: 'json',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          success: (res) => {
+            console.log("-- res ", res);
+            getClients("/api/clients/");
+            Swal.fire({
+              title: 'Registro eliminado éxitosamente',
+              text: '',
+              icon: 'success',
+              timer: 3000
+            });
+          },
+          error: (err) => {
+            console.error(err.responseJSON);
+            Swal.fire({
+              title: '¡Uppss! Ha ocurrido un error.',
+              text: '',
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            });
+          },
+          complete: (_) => {
+            // spinner(false);
+          }
+        });
+      }
+    });
+    
+  }
+
+  const setTable = ({ results: clients }) => {
+    $('#table-clients').empty();
+    if (!clients.length) return;
+    const table = document.getElementById("table-clients");
+    currentClients = clients;
+    clients.forEach((item, index) => {
+        let data = `
+          <td>${item.full_name}</td>
+          <td>${PERSON_TYPE[item.person_type]}</td>
+          <td>${item.nationality}</td>
+          <td>${GENDER[item.gender]}</td>
+          <td><a href="mailto:${item.email}">${item.email}</a></td>
+          <td>${item.birth_date}</td>
+          <td><a href="${item.phone_prefix}${item.phone}">(${item.phone_prefix}) ${item.phone}</a></td>
+          <td>${item.address}</td>
+          <td>
+            <button class="btn btn-sm btn-warning mx-1" type="button" onClick="openFormEdit('${item.id}');">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger mx-1" type="button" onClick="remove('${item.id}');">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>`;
+        let row = document.createElement("tr");
+        row.innerHTML= data;
+        table.appendChild(row);
+    });
+  }
+
+  const setPagination = ({ count, next, previous }) => {
+    const totalPaginate = count / 2;
+    $('#tablePaginate').empty();
+    let actionPreviousPage = previous ? `onclick="getClients('${previous}');"` : "disabled";
+    $("#tablePaginate").append(`<li class="page-item"><a class="page-link" href="#" ${actionPreviousPage}>Anterior</a></li>`);
+
+    let actionNextPage = next ? `onclick="getClients('${next}');"` : "disabled";
+    $("#tablePaginate").append(`<li class="page-item"><a class="page-link" href="#" ${actionNextPage}>Siguiente</a></li>`);
+  }
+
+  const filterBySearch = () => {
+    const search = $("#search").val();
+    const url = search !== "T" ? `/api/clients/?search=${search}` : "/api/clients/";
+    getClients(url);
+  }
+
+  // FORMULARIO
+  $(document).ready(function() {
+    $("form[name='formClient']").submit(function(e) {
+      e.preventDefault();
+    }).validate({
+      rules: {
+        full_name: "required",
+        birth_date: "required",
+        email: {
+          required: true,
+          email: true
+        },
+        address: "required",
+        phone: {
+          digits: true,
+          minlength: 7
+        },
+        gender: "required",
+        person_type: "required",
+      },
+      messages: {
+        full_name: "Ingresa un Nombre Completo",
+        birth_date: "Ingresa una fecha de Nacimiento",
+        email: "Ingresa un Correo Electrónico",
+        address: "Ingresa una Dirección",
+        phone: {
+          required: "Ingresa un Número de Télefono",
+          digits: "Debe ingresar sólo números",
+          minlength: "Debe tener al menos 7 digitos"
+        },
+        gender: "Selecciona un Genero",
+        person_type: "Selecciona un Tipo de Persona",
+      },
+      submitHandler: function(form) {
+        submitForm();
+        return;
+      }
+    });
+  });
+
+  const getFieldsValues = () => JSON.stringify({
+    csrfmiddlewaretoken: '{{ csrf_token }}',
+    full_name: $('#full_name').val(),
+    birth_date: $('#birth_date').val(),
+    nationality: $('#nationality').val(),
+    address: $('#address').val(),
+    email: $('#email').val(),
+    phone_prefix: $('#phone_prefix').val(),
+    phone: $('#phone').val(),
+    gender: $('#gender').val(),
+    person_type: $('#person_type').val(),
+  });
+
+  const clearFieldsForm = () => {
+    $('#full_name').val("");
+    $('#birth_date').val("");
+    $('#nationality').val("");
+    $('#address').val("");
+    $('#email').val("");
+    $('#phone_prefix').val(null);
+    $('#phone').val("");
+    $('#gender').val(null);
+    $('#person_type').val(null);
+  }
+
+  const submitForm = () => {
+    const data = getFieldsValues();
+    //spinner(true);
+    $.ajax({
+      type: isClientEdit ? 'PUT' : 'POST',
+      url: isClientEdit ? `/api/clients/${clientId}/` : '/api/clients/',
+      dataType: 'json',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      },
+      data,
+      success: (res) => {
+        console.log("-- res ", res);
+        // alert(res.message);
+        Swal.fire({
+          title: `Registro ${ isClientEdit ? 'actualizado' : 'creado'} éxitosamente`,
+          text: '',
+          icon: 'success',
+          timer: 3000
+        });
+        isClientEdit = false;
+        getClients("/api/clients/");
+        showModal(false);
+        clearFieldsForm();
+      },
+      error: (err) => {
+        const { responseJSON: data } = err;
+        console.error(data.message);
+        Swal.fire({
+          title: '¡Uppss! ',
+          text: data.message,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      },
+      complete: (_) => {
+        // spinner(false);
+      }
+    });
+  }
+
+</script>
+{% endblock scripts %}

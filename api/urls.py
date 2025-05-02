@@ -5,9 +5,28 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+# Vistas
+from apps.client.views import ClientViewSet
+from apps.credit.views import CreditViewSet
+from apps.bank.views import BankViewSet
+
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 
+"""
+	Client Module
+"""
+router.register('clients', ClientViewSet)
+
+"""
+	Credit Module
+"""
+router.register('credits', CreditViewSet)
+
+"""
+	Bank Module
+"""
+router.register('banks', BankViewSet)
 
 # The API URLs are now determined automatically by the router.
 # Additionally, we include the login URLs for the browsable API.

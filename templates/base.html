@@ -1,0 +1,52 @@
+{% load static %}
+<html lang="en" id="screen">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <!-- Meta-->
+    <meta name="title" content="Credit Bank App">
+    <meta name="description" content="Gestion de procesos bancarios">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    <meta name="author" content="Credit Bank">
+    <!-- Stylesheets-->
+    {% block styles %}
+    <link rel="stylesheet" href="/static/bootstrap-5.3.3/css/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="/static/fontawesome-free-5.15.4-web/css/all.css"
+    />
+    <link rel="stylesheet" href="/static/sweetalert2/sweetalert2.min.css" />
+    {% endblock %}
+    {% block custom_styles %}{% endblock %}
+    <script src="/static/js/jquery-3.7.1.min.js"></script>
+    <title>{% block title %}{% endblock title %}</title>
+  </head>
+  <body>
+    {% block navbar %}{% endblock navbar %}
+    {% block content %}{% endblock content %}
+    {% block footer %}{% endblock footer %}
+    <div id="loading-overlay" class="d-none">
+      <div class="loader"></div>
+    </div>
+    <script>
+      const spinner = (value) => {
+        let element = document.getElementById("loading-overlay");
+  
+        if (value) {
+          element.classList.remove("d-none");
+          element.classList.add("d-flex");
+        } else {
+          element.classList.remove("d-flex");
+          element.classList.add("d-none");
+        }
+      }
+    </script>
+    <script src="/static/bootstrap-5.3.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="/static/jquery-validation-1.19.5/jquery.validate.min.js"></script>
+    {% block scripts %}{% endblock scripts %}
+  </body>
+</html>

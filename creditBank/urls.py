@@ -21,7 +21,9 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('api/', include('api.urls')),
+    path('', include('apps.base.urls')),
     path(settings.ADMIN_URL, admin.site.urls),
+    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
 
 urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
