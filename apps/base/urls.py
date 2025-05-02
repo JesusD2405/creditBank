@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from ..auth2.views import loginView, LogoutView
 from ..client.views import ClientView
 from ..credit.views import CreditsView
@@ -8,13 +8,13 @@ urlpatterns = [
     # Default Path
     path('', ClientView, name="clients_list"),
     # Auth 
-    path('login', loginView, name="login"),
-    path('logout', LogoutView, name='logout'),
+    re_path(r'^login/?$', loginView, name="login"),
+    re_path(r'^logout/?$', LogoutView, name='logout'),
     # Clientes
-    path('clients', ClientView, name="clients_list"),
+    re_path(r'^clients/?$', ClientView, name="clients_list"),
     # Creditos
-    path('credits', CreditsView, name="credits_list"),
+    re_path(r'^credits/?$', CreditsView, name="credits_list"),
     # Bancos
-    path('banks', BankView, name="banks_list"),
+    re_path(r'^banks/?$', BankView, name="banks_list"),
     
 ]
