@@ -5,12 +5,6 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from django.shortcuts import redirect
 from django.contrib.auth import login, authenticate, logout
 
-# Serializadores
-from .serializers import *
-
-#Modelos
-from .models import *
-
 import logging
 logger = logging.getLogger( __name__ )
 
@@ -28,10 +22,10 @@ def loginView(request):
             # TODO: Redireccionar a la vista (por definir)
             return redirect('')
         message_error = '¡Usuario o Contraseña Inválida!'
-        return Response({'message_error': message_error }, template_name= 'login.html')
+        return Response({'message_error': message_error }, template_name= 'auth/login.html')
 
     # TODO: Falta crear vista de login
-    return Response({}, template_name= 'login.html')
+    return Response({}, template_name= 'auth/login.html')
 
 
 # Logout View
