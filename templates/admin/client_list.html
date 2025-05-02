@@ -119,6 +119,10 @@
 {% block scripts %}
 <script>
 
+  let currentClients = [];
+  let isClientEdit = false;
+  let clientId = null;
+
   const PERSON_TYPE = {
     "N": "NATURAL",
     "J": "JURIDICA",
@@ -127,6 +131,17 @@
   const GENDER = {
     "M": "MASCULINO",
     "F": "FEMENINO",
+  }
+
+  const showModal = (openModal) => {
+    const myModalEl = document.getElementById('formClientModal');
+    let modal = bootstrap.Modal.getInstance(myModalEl) || new bootstrap.Modal(myModalEl);
+
+    if (openModal) {
+      modal.show();  
+    } else {
+      modal.hide();
+    }
   }
 
   const getClients = (url) => {
@@ -152,9 +167,31 @@
   }
   getClients("/api/clients/");
 
+  const openFormEdit = (id) => {
+    const client = currentClients.find((data) => data.id === id);
+
+    if (client) {
+      $('#full_name').val(client.full_name);
+      $('#birth_date').val(client.birth_date);
+      $('#nationality').val(client.nationality);
+      $('#address').val(client.address);
+      $('#email').val(client.email);
+      $('#phone_prefix').val(client.phone_prefix);
+      $('#phone').val(client.phone);
+      $('#gender').val(client.gender);
+      $('#person_type').val(client.person_type);
+
+      clientId = client.id;
+      isClientEdit = true;
+      showModal(true);
+    }
+  }
+
   const remove = (id) => {
+    const client = currentClients.find((data) => data.id === id);
+
     Swal.fire({
-      title: '¿Está seguro de eliminar este cliente?',
+      title: `¿Está seguro de eliminar el cliente "${ client.full_name}"?`,
       text: '',
       icon: 'warning',
       confirmButtonText: 'Confirmar',
@@ -208,6 +245,7 @@
     $('#table-clients').empty();
     if (!clients.length) return;
     const table = document.getElementById("table-clients");
+    currentClients = clients;
     clients.forEach((item, index) => {
         let data = `
           <td>${item.full_name}</td>
@@ -219,7 +257,7 @@
           <td><a href="${item.phone_prefix}${item.phone}">(${item.phone_prefix}) ${item.phone}</a></td>
           <td>${item.address}</td>
           <td>
-            <button class="btn btn-sm btn-warning mx-1" type="button" onClick="">
+            <button class="btn btn-sm btn-warning mx-1" type="button" onClick="openFormEdit('${item.id}');">
               <i class="fa fa-pencil"></i>
             </button>
             <button class="btn btn-sm btn-danger mx-1" type="button" onClick="remove('${item.id}');">
@@ -317,8 +355,8 @@
     const data = getFieldsValues();
     //spinner(true);
     $.ajax({
-      type: "POST",
-      url: "/api/clients/",
+      type: isClientEdit ? 'PUT' : 'POST',
+      url: isClientEdit ? `/api/clients/${clientId}/` : '/api/clients/',
       dataType: 'json',
       headers: {
         'X-CSRFToken': '{{ csrf_token }}',
@@ -329,16 +367,15 @@
         console.log("-- res ", res);
         // alert(res.message);
         Swal.fire({
-          title: 'Registro creado éxitosamente',
+          title: `Registro ${ isClientEdit ? 'actualizado' : 'creado'} éxitosamente`,
           text: '',
           icon: 'success',
           timer: 3000
         });
+        isClientEdit = false;
         getClients("/api/clients/");
+        showModal(false);
         clearFieldsForm();
-        const myModalEl = document.getElementById('formClientModal');
-        const modal = bootstrap.Modal.getInstance(myModalEl)
-        modal.hide();
       },
       error: (err) => {
         const { responseJSON: data } = err;
