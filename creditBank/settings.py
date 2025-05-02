@@ -50,6 +50,7 @@ LOCAL_APPS = [
     'apps.base.apps.BaseConfig',
     'apps.client.apps.ClientConfig',
     'apps.credit.apps.CreditConfig',
+    'apps.bank.apps.BankConfig',
 ]
 
 THIRD_APPS = [
