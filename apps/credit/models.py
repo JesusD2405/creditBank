@@ -19,7 +19,7 @@ class Credit(BaseModel, SafeDeleteModel):
     minimum_payment = models.FloatField(verbose_name='Pago Mínimo')
     maximum_payment = models.FloatField(verbose_name='Pago Máximo')
     credit_period = models.PositiveIntegerField(verbose_name='Plazo de Crédito (Meses)')
-    credit_type = models.CharField(max_length=2, choices=CREDIT_TYPE, verbose_name='Tipo de Crédito')
+    credit_type = models.CharField(max_length=2, choices=CREDIT_TYPE, default="A", verbose_name='Tipo de Crédito')
     client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name='Cliente')
     # bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name='Banco')
 

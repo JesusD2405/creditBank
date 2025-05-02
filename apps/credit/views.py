@@ -8,7 +8,7 @@ from .serializers import *
 #Modelos
 from .models import *
 
-class CreditViewSet(viewsets.ReadOnlyModelViewSet):
+class CreditViewSet(viewsets.ModelViewSet):
 	queryset = Credit.objects.all()
 	serializer_class = CreditSerializer
 	filter_backends = [

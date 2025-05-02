@@ -8,7 +8,7 @@ from .serializers import *
 #Modelos
 from .models import *
 
-class ClientViewSet(viewsets.ReadOnlyModelViewSet):
+class ClientViewSet(viewsets.ModelViewSet):
 	queryset = Client.objects.all()
 	serializer_class = ClientSerializer
 	filter_backends = [
