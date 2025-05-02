@@ -18,7 +18,13 @@ _Es importante tener instaladas las herramientas anteriormente mencionadas para 
 
 _*** Preparando nuestras variables de entorno ***_
 
-_Nos situamos en la raíz y hacemos una copia del archivo docker-env.dist reemplazando la extensión del archivo por el nombre del ambiente (local)_
+_Nos situamos en la raíz y hacemos una copia del archivo docker-compose.yml.dist (En caso de adaptar aun más la configuración se podría adaptar los cambios requeridos)_
+
+```
+ cp docker-compose.yml.dist docker-compose.yml
+```
+
+_También realizamos una copia del archivo docker-env.dist reemplazando la extensión del archivo por el nombre del ambiente (local)_
 
 ```
  cp docker-env.dist docker-env.local
@@ -55,11 +61,22 @@ _Para ingresar a ver la documentación de la Api ingresamos la siguiente url en 
 /api/docs
 ```
 
+## Acceso a vistas administrativas 🧪
+
+_Para ingresar al login y poder gestionar las vistas (Clientes, Créditos y Bancos) debemos ya haber creado el usuario Admin (Especificado en la etapa de instalación), luego podemos acceder a nuestra URL principal (Por defecto http://localhost:8000 en caso de no haber modificado el puerto):_
+
+
 ## Despliegue 📦
 
 _*** Preparando nuestras variables de entorno ***_
 
-_Nos situamos en el directorio "./docker" y hacemos una copia del archivo docker-env.dist reemplazando la extensión del archivo por el nombre del ambiente a desplegar:_
+_Nos situamos en la raíz y hacemos una copia del archivo docker-compose.yml.dist (En caso de adaptar aun más la configuración se podría adaptar los cambios requeridos)_
+
+```
+ cp docker-compose.yml.dist docker-compose.yml
+```
+
+_Luego hacemos una copia del archivo docker-env.dist reemplazando la extensión del archivo por el nombre del ambiente a desplegar:_
 
 1. dev (Desarrollo).
 2. pre (Pre-Producción).
