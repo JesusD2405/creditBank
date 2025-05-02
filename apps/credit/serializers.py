@@ -10,8 +10,10 @@ from ..bank.serializers import BankSerializer
 
 # Crédito
 class CreditSerializer(serializers.ModelSerializer):
-    client = ClientSerializer()
-    bank = BankSerializer()
+    client = ClientSerializer(read_only=True)
+    client_id = serializers.UUIDField()
+    bank = BankSerializer(read_only=True)
+    bank_id = serializers.UUIDField()
 
     class Meta:
         model = Credit
@@ -19,21 +21,16 @@ class CreditSerializer(serializers.ModelSerializer):
             'deleted',
             'deleted_by_cascade',
         ]
-    
-    def create(self, validated_data):
-        try:
-            bank_data = validated_data.pop('bank')
-            client_data = validated_data.pop('client')
-            
-            bank = Bank.objects.get(id=bank_data['id'])
-            client = Client.objects.get(id=client_data['id'])
-            
-            return Credit.objects.create(
-                bank=bank,
-                client=client,
-                **validated_data
-            )
-        except KeyError as e:
-            raise serializers.ValidationError(f'Falta campo requerido: {str(e)}')
-        except (Bank.DoesNotExist, Client.DoesNotExist):
-            raise serializers.ValidationError('Banco o Cliente no existe')
+        
+    def validate(self, data):
+        bank = Bank.objects.get(id=data['bank_id'])
+        if bank is None:
+          raise serializers.ValidationError('Bank not found.')
+
+        data['bank'] = bank
+        
+        client = Client.objects.get(id=data['client_id'])
+        if client is None:
+          raise serializers.ValidationError('Client not found.')
+
+        return data

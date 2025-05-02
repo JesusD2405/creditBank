@@ -104,8 +104,6 @@
 {% block scripts %}
 <script>
 
-  let currentClients = [];
-  let currentBanks = [];
   const CREDIT_TYPE = {
     "A": "Automotriz",
     "H": "Hipotecarios",
@@ -191,7 +189,6 @@
       success: (res) => {
         console.log("-- clients ", res);
         const { results: clients } = res;
-        currentClients = clients;
         $('#client').empty();
         $('#client').html('<option value="null" disabled>-- Seleccione --</option>');
         clients.forEach(item => {
@@ -222,7 +219,6 @@
       success: (res) => {
         console.log("-- banks ", res);
         const { results: banks } = res;
-        currentBanks = banks;
         $('#bank').empty();
         $('#bank').html('<option value="null" disabled>-- Seleccione --</option>');
         banks.forEach(item => {
@@ -297,21 +293,16 @@
     });
   });
 
-  const getFieldsValues = () => {
-    const client = currentClients.find((item) => item.id === $('#client').val()) ;
-    const bank = currentBanks.find((item) => item.id === $('#bank').val()) ;
-
-    return JSON.stringify({
-      csrfmiddlewaretoken: '{{ csrf_token }}',
-      description: $('#description').val(),
-      credit_type: $('#credit_type').val(),
-      minimum_payment: $('#minimum_payment').val(),
-      maximum_payment: $('#maximum_payment').val(),
-      credit_period: $('#credit_period').val(),
-      client,
-      bank,
-    })
-};
+  const getFieldsValues = () => JSON.stringify({
+    csrfmiddlewaretoken: '{{ csrf_token }}',
+    description: $('#description').val(),
+    credit_type: $('#credit_type').val(),
+    minimum_payment: $('#minimum_payment').val(),
+    maximum_payment: $('#maximum_payment').val(),
+    credit_period: $('#credit_period').val(),
+    client_id: $('#client').val(),
+    bank_id: $('#bank').val(),
+  });
 
   const clearFieldsForm = () => {
     $('#client').val(null);
