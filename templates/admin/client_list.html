@@ -11,7 +11,7 @@
     <div class="card-header d-flex d-flex flex-column flex-md-row justify-content-between align-items-end">
       <div class="d-flex">
         <h3>Listado de Clientes</h3>
-        <button id="btnFormLabel" type="submit" class="btn btn-sm btn-success mx-2" type="button" data-bs-toggle="modal" data-bs-target="#formClientModal">
+        <button id="btnFormLabel" class="btn btn-sm btn-success mx-2" type="button" data-bs-toggle="modal" data-bs-target="#formClientModal">
           <i class="fa fa-plus"></i>
         </button>
       </div>
@@ -32,6 +32,7 @@
           <th scope="col">Fecha de Nacimiento</th>
           <th scope="col">Télefono</th>
           <th scope="col">Dirección</th>
+          <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody id="table-clients">
@@ -129,7 +130,7 @@
   }
 
   const getClients = (url) => {
-    spinner(true);
+    // spinner(true);
     url = url.includes("http://") && !url.includes("localhost") ? url.replace("http://", "https://") : url;
     $.ajax({
       type: "GET",
@@ -145,9 +146,62 @@
         console.error(err.responseJSON)
       },
       complete: (_) => {
-        spinner(false);
+        // spinner(false);
       }
     });
+  }
+  getClients("/api/clients/");
+
+  const remove = (id) => {
+    Swal.fire({
+      title: '¿Está seguro de eliminar este cliente?',
+      text: '',
+      icon: 'warning',
+      confirmButtonText: 'Confirmar',
+      cancelButtonText: 'Cancelar',
+      showCancelButton: true,
+      showCloseButton: true,
+      customClass: {
+        closeButton: "bg-danger",
+        cancelButton: "bg-danger",
+        confirmButton: "bg-success"
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          type: "DELETE",
+          url: `/api/clients/${id}/`,
+          dataType: 'json',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          success: (res) => {
+            console.log("-- res ", res);
+            getClients("/api/clients/");
+            Swal.fire({
+              title: 'Registro eliminado éxitosamente',
+              text: '',
+              icon: 'success',
+              timer: 3000
+            });
+          },
+          error: (err) => {
+            console.error(err.responseJSON);
+            Swal.fire({
+              title: '¡Uppss! Ha ocurrido un error.',
+              text: '',
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            });
+          },
+          complete: (_) => {
+            // spinner(false);
+          }
+        });
+      }
+    });
+    
   }
 
   const setTable = ({ results: clients }) => {
@@ -163,7 +217,15 @@
           <td><a href="mailto:${item.email}">${item.email}</a></td>
           <td>${item.birth_date}</td>
           <td><a href="${item.phone_prefix}${item.phone}">(${item.phone_prefix}) ${item.phone}</a></td>
-          <td>${item.address}</td>`;
+          <td>${item.address}</td>
+          <td>
+            <button class="btn btn-sm btn-warning mx-1" type="button" onClick="">
+              <i class="fa fa-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-danger mx-1" type="button" onClick="remove('${item.id}');">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>`;
         let row = document.createElement("tr");
         row.innerHTML= data;
         table.appendChild(row);
@@ -185,8 +247,6 @@
     const url = search !== "T" ? `/api/clients/?search=${search}` : "/api/clients/";
     getClients(url);
   }
-
-  getClients("/api/clients/");
 
   // FORMULARIO
   $(document).ready(function() {
