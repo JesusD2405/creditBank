@@ -1,6 +1,7 @@
 from django.urls import path
 from ..auth2.views import loginView, LogoutView
 from ..client.views import ClientView
+from ..credit.views import CreditsView
 
 urlpatterns = [
     # Default Path
@@ -10,5 +11,7 @@ urlpatterns = [
     path('logout', LogoutView, name='logout'),
     # Clients
     path('clients', ClientView, name="clients_list"),
+    # Creditos
+    path('credits', CreditsView, name="credits_list"),
     
 ]
