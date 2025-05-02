@@ -8,7 +8,7 @@ from ..base.models import BaseModel
 # Modelo Cliente
 class Client(BaseModel, SafeDeleteModel):
 
-    TYPE_PERSON = (
+    PERSON_TYPE = (
         ('N', 'NATURAL'),
         ('J', 'JURIDICO'),
     )
@@ -26,8 +26,9 @@ class Client(BaseModel, SafeDeleteModel):
     email = models.EmailField(max_length=255, verbose_name='Correo Electrónico')
     phone_prefix = models.CharField(max_length=4, verbose_name='Prefijo de Tlf (+58)', null=True, blank=True)
     phone = models.CharField(max_length=255, verbose_name='Teléfono', null=True, blank=True)
-    type_person = models.CharField(max_length=1, choices=TYPE_PERSON, default='N', verbose_name='Tipo de Persona')
-    gender = models.CharField(max_length=6, choices=GENDER_TYPE, verbose_name='Género')
+    person_type = models.CharField(max_length=1, choices=PERSON_TYPE, default='N', verbose_name='Tipo de Persona')
+    gender = models.CharField(max_length=2, choices=GENDER_TYPE, verbose_name='Género')
+    # bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name='Banco')
 
     class Meta:
         db_table = "client"
