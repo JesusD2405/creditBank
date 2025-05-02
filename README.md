@@ -41,7 +41,7 @@ _Si deseamos cargar y ejecutar la migraciones del proyecto, para tener una BD li
 ./manage.py migrate
 ```
 
-_Para crear el Super Usuario para Django Admin:_
+_Para crear el Super Usuario para Django Admin (Con este usuario puede acceder a las vistas administrativas):_
 
 ```
 ./manage.py createsuperuser
