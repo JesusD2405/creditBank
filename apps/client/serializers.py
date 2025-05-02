@@ -5,6 +5,7 @@ from .models import *
 
 # Clientes
 class ClientSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField()
 
     class Meta:
         model = Client

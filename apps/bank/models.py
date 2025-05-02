@@ -3,7 +3,6 @@ from safedelete.models import SafeDeleteModel
 from django.db.models import Q
 
 from ..base.models import BaseModel
-from ..client.models import Client
 
 
 # Modelo Banco

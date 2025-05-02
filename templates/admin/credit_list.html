@@ -8,8 +8,11 @@
 <div class="container pt-5">
   <div class="card">
     <div class="card-header d-flex d-flex flex-column flex-md-row justify-content-between align-items-end">
-      <div>
+      <div class="d-flex">
         <h3>Listado de Créditos</h3>
+        <button id="btnFormLabel" class="btn btn-sm btn-success mx-2" type="button" data-bs-toggle="modal" data-bs-target="#formCreditModal">
+          <i class="fa fa-plus"></i>
+        </button>
       </div>
       <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12 d-flex align-items-end mt-2">
         <input type="text" name="search" id="search" class="form-control mb-2" placeholder="BUSCAR" onkeyup="filterBySearch()">
@@ -38,15 +41,86 @@
       </ul>
     </nav>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="formCreditModal" >
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header text-center p-2">
+        <div class="d-flex justify-content-center">
+          <h1 class="modal-title fs-5" id="formLabel"></h1>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-5 pt-3 pb-3">
+        <form id="formCredit" class="row" name="formCredit">
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="client" class="form-label fw-bold">Cliente</label>
+            <select name="client" id="client" class="form-select form-control mb-2" aria-label="-- Seleccione --" required>
+              <option value="" disabled>-- Seleccione --</option>
+            </select>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="description" class="form-label fw-bold fs-6">Descripción</label>
+            <input id="description" name="description" type="text" class="form-control fs-6" required>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="minimum_payment" class="form-label fw-bold fs-6">Pago Mínimo</label>
+            <input id="minimum_payment" name="minimum_payment" type="number" class="form-control fs-6">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="maximum_payment" class="form-label fw-bold fs-6">Pago Máximo</label>
+            <input id="maximum_payment" name="maximum_payment" type="number" class="form-control fs-6">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="credit_period" class="form-label fw-bold fs-6">Plazo de Crédito</label>
+            <input id="credit_period" name="credit_period" type="text" class="form-control fs-6">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="credit_type" class="form-label fw-bold">Tipo de Crédito</label>
+            <select name="credit_type" id="credit_type" class="form-select form-control mb-2" aria-label="-- Seleccione --" required>
+              <option value="" disabled>-- Seleccione --</option>
+              <option value="A">Automotriz</option>
+              <option value="H">Hipotecarios</option>
+              <option value="C">Comerciales</option>
+            </select>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="bank" class="form-label fw-bold">Banco</label>
+            <select name="bank" id="bank" class="form-select form-control mb-2" aria-label="-- Seleccione --" required>
+              <option value="" disabled>-- Seleccione --</option>
+            </select>
+          </div>
+          <div class="d-flex flex-row justify-content-around mt-5">
+            <button id="btnFormLabel" type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
 
 {% block scripts %}
 <script>
 
+  let currentClients = [];
+  let currentBanks = [];
   const CREDIT_TYPE = {
     "A": "Automotriz",
     "H": "Hipotecarios",
     "C": "Comerciales",
+  }
+
+  const showModal = (openModal) => {
+    const myModalEl = document.getElementById('formCreditModal');
+    let modal = bootstrap.Modal.getInstance(myModalEl) || new bootstrap.Modal(myModalEl);
+
+    if (openModal) {
+      modal.show();  
+    } else {
+      modal.hide();
+    }
   }
 
   const getCredits = (url) => {
@@ -70,6 +144,7 @@
       }
     });
   }
+  getCredits("/api/credits/");
 
   const setTable = ({ results: credits }) => {
     $('#table-credits').empty();
@@ -83,7 +158,7 @@
           <td>${item.maximum_payment}</td>
           <td>${item.credit_period}</td>
           <td>${CREDIT_TYPE[item.credit_type]}</td>
-          <td>-</td>`;
+          <td>${item.bank?.name}</td>`;
         let row = document.createElement("tr");
         row.innerHTML= data;
         table.appendChild(row);
@@ -106,6 +181,188 @@
     getCredits(url);
   }
 
-  getCredits("/api/credits/");
+  const getClients = () => {
+    // spinner(true);
+    $.ajax({
+      type: "GET",
+      url: '/api/clients/',
+      dataType: 'json',
+      contentType: 'application/json',
+      success: (res) => {
+        console.log("-- clients ", res);
+        const { results: clients } = res;
+        currentClients = clients;
+        $('#client').empty();
+        $('#client').html('<option value="null" disabled>-- Seleccione --</option>');
+        clients.forEach(item => {
+          $('#client').append(
+              $('<option></option>')
+                  .val(item.id)
+                  .text(item.full_name)
+          );
+        });
+      },
+      error: (err) => {
+        console.error(err.responseJSON)
+      },
+      complete: (_) => {
+        // spinner(false);
+      }
+    });
+  }
+  getClients();
+
+  const getBanks = () => {
+    // spinner(true);
+    $.ajax({
+      type: "GET",
+      url: '/api/banks/',
+      dataType: 'json',
+      contentType: 'application/json',
+      success: (res) => {
+        console.log("-- banks ", res);
+        const { results: banks } = res;
+        currentBanks = banks;
+        $('#bank').empty();
+        $('#bank').html('<option value="null" disabled>-- Seleccione --</option>');
+        banks.forEach(item => {
+          $('#bank').append(
+              $('<option></option>')
+                  .val(item.id)
+                  .text(item.name)
+          );
+        });
+      },
+      error: (err) => {
+        console.error(err.responseJSON)
+      },
+      complete: (_) => {
+        // spinner(false);
+      }
+    });
+  }
+  getBanks();
+
+  // FORMULARIO
+  $(document).ready(function() {
+    $("form[name='formCredit']").submit(function(e) {
+      e.preventDefault();
+    }).validate({
+      rules: {
+        client: "required",
+        description: "required",
+        minimum_payment: {
+          required: true,
+          digits: true,
+          min: 1,
+        },
+        maximum_payment: {
+          required: true,
+          digits: true,
+          min: 1,
+        },
+        credit_period: {
+          required: true,
+          digits: true,
+          min: 1,
+        },
+        credit_type: "required",
+        bank: "required",
+      },
+      messages: {
+        client: "Selecciona un cliente",
+        description: "Ingresa una descripción",
+        minimum_payment: {
+          required: "Ingresa un monto mínimo",
+          digits: "El monto mínimo debe ser un número mayor a 0",
+          min: "El monto mínimo debe ser mayor a 0",
+        },
+        maximum_payment: {
+          required: "Ingresa un monto máximo",
+          digits: "El monto máximo debe ser un número mayor a 0",
+          min: "El monto máximo debe ser mayor a 0",
+        },
+        credit_period: {
+          required: "Ingresa un plazo de crédito",
+          digits: "El plazo de crédito debe ser un número mayor a 0",
+          min: "El plazo de crédito debe ser mayor a 0",
+        },
+        credit_type: "Selecciona un tipo de credito",
+        bank: "Selecciona un banco",
+      },
+      submitHandler: function(form) {
+        submitForm();
+        return;
+      }
+    });
+  });
+
+  const getFieldsValues = () => {
+    const client = currentClients.find((item) => item.id === $('#client').val()) ;
+    const bank = currentBanks.find((item) => item.id === $('#bank').val()) ;
+
+    return JSON.stringify({
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+      description: $('#description').val(),
+      credit_type: $('#credit_type').val(),
+      minimum_payment: $('#minimum_payment').val(),
+      maximum_payment: $('#maximum_payment').val(),
+      credit_period: $('#credit_period').val(),
+      client,
+      bank,
+    })
+};
+
+  const clearFieldsForm = () => {
+    $('#client').val(null);
+    $('#description').val("");
+    $('#minimum_payment').val("");
+    $('#maximum_payment').val("");
+    $('#credit_period').val("");
+    $('#credit_type').val(null);
+    $('#bank').val(null);
+  }
+
+  const submitForm = () => {
+    const data = getFieldsValues();
+    //spinner(true);
+    $.ajax({
+      type: 'POST',
+      url: '/api/credits/',
+      dataType: 'json',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      },
+      data,
+      success: (res) => {
+        console.log("-- res ", res);
+        // alert(res.message);
+        Swal.fire({
+          title: `Registro creado éxitosamente`,
+          text: '',
+          icon: 'success',
+          timer: 3000
+        });
+        getCredits("/api/credits/");
+        showModal(false);
+        clearFieldsForm();
+      },
+      error: (err) => {
+        const { responseJSON: data } = err;
+        console.error(data.message);
+        Swal.fire({
+          title: '¡Uppss! ',
+          text: data.message,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      },
+      complete: (_) => {
+        // spinner(false);
+      }
+    });
+  }
+
 </script>
 {% endblock scripts %}
