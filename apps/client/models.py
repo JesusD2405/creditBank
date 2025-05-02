@@ -3,7 +3,7 @@ from safedelete.models import SafeDeleteModel
 from django.db.models import Q
 
 from ..base.models import BaseModel
-
+from ..bank.models import Bank
 
 # Modelo Cliente
 class Client(BaseModel, SafeDeleteModel):
@@ -28,7 +28,7 @@ class Client(BaseModel, SafeDeleteModel):
     phone = models.CharField(max_length=255, verbose_name='Teléfono', null=True, blank=True)
     person_type = models.CharField(max_length=1, choices=PERSON_TYPE, default='N', verbose_name='Tipo de Persona')
     gender = models.CharField(max_length=2, choices=GENDER_TYPE, verbose_name='Género')
-    # bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name='Banco')
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE, verbose_name='Banco')
 
     class Meta:
         db_table = "client"

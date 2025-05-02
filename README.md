@@ -11,7 +11,6 @@ Mira **Deployment** para conocer como desplegar el proyecto.
 ### Pre-requisitos 📋
 
 1. [Docker](https://docs.docker.com/)
-2. [PostgreSql](https://www.postgresql.org/download/)
 
 _Es importante tener instaladas las herramientas anteriormente mencionadas para iniciar los siguientes pasos._
 
@@ -35,12 +34,6 @@ _Finalmente, en la raíz del proyecto ejecutamos_
 
 _De esta manera tendríamos todos nuestros conenedores levantados._
 
-_Si deseamos cargar una BD existente hacía nuestro contenedor de BD, ejecutamos:_
-
-```
-cat .\backup-app.sql | docker exec -i container-db psql -U USER -d NAME_DB
-```
-
 _Si deseamos cargar y ejecutar la migraciones del proyecto, para tener una BD limpia, ejecutamos dentro del CONTENEDOR de la API:_
 
 ```
@@ -48,10 +41,18 @@ _Si deseamos cargar y ejecutar la migraciones del proyecto, para tener una BD li
 ./manage.py migrate
 ```
 
-_Para crear el Super Usuario para Django Admin:_
+_Para crear el Super Usuario para Django Admin (Con este usuario puede acceder a las vistas administrativas):_
 
 ```
 ./manage.py createsuperuser
+```
+
+## Documentación de Api (Swagger) 📚
+
+_Para ingresar a ver la documentación de la Api ingresamos la siguiente url en el navegador:_
+
+```
+/api/docs
 ```
 
 ## Despliegue 📦
@@ -85,6 +86,10 @@ _Herramientas utilizadas en el proyecto:_
 - [Docker](https://docs.docker.com/compose/install/) - Es una tecnología de contenedorización de código abierto para crear y contener sus aplicaciones.
 - [Django Rest Framework](https://www.django-rest-framework.org/) - El marco Django REST es un conjunto de herramientas potente y flexible para crear API web.
 - [Django-safedelete](https://django-safedelete.readthedocs.io/en/latest/index.html) - Proporciona un modelo abstracto, que le permite recuperar o eliminar de forma transparente sus objetos, sin tener que eliminarlos de su base de datos..
+- [JQuery](https://jquery.com/) - jQuery es una biblioteca multiplataforma de JavaScript, creada inicialmente por John Resig, que permite simplificar la manera de interactuar con los documentos HTML, manipular el árbol DOM, manejar eventos, desarrollar animaciones y agregar interacción con la técnica AJAX a páginas web.
+- [JQuery Validation](https://jqueryvalidation.org/) - Plugin de jQuery facilita la validación de formularios del lado del cliente, a la vez que ofrece numerosas opciones de personalización.
+- [Bootstrap v5.3](https://getbootstrap.com/) - Potente kit de herramientas frontend extensible y repleto de funciones. Crea y personaliza con Sass, utiliza componentes y sistemas de cuadrícula prediseñados, y dale vida a tus proyectos con potentes plugins de JavaScript.
+- [Sweetalert2](https://getbootstrap.com/) - Un reemplazo hermoso, responsivo, personalizable y accesible (WAI-ARIA) para los cuadros emergentes de JavaScript.
 
 ---
 

@@ -32,6 +32,7 @@
           <th scope="col">Fecha de Nacimiento</th>
           <th scope="col">Télefono</th>
           <th scope="col">Dirección</th>
+          <th scope="col">Banco</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -106,6 +107,12 @@
               <option value="J">JURIDICO</option>
             </select>
           </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="bank" class="form-label fw-bold">Banco</label>
+            <select name="bank" id="bank" class="form-select form-control mb-2" aria-label="-- Seleccione --" required>
+              <option value="" disabled>-- Seleccione --</option>
+            </select>
+          </div>
           <div class="d-flex flex-row justify-content-around mt-5">
             <button id="btnFormLabel" type="submit" class="btn btn-primary">Guardar</button>
           </div>
@@ -122,6 +129,7 @@
   let currentClients = [];
   let isClientEdit = false;
   let clientId = null;
+  let currentBanks = [];
 
   const PERSON_TYPE = {
     "N": "NATURAL",
@@ -180,6 +188,7 @@
       $('#phone').val(client.phone);
       $('#gender').val(client.gender);
       $('#person_type').val(client.person_type);
+      $('#bank').val(client.bank.id);
 
       clientId = client.id;
       isClientEdit = true;
@@ -256,6 +265,7 @@
           <td>${item.birth_date}</td>
           <td><a href="${item.phone_prefix}${item.phone}">(${item.phone_prefix}) ${item.phone}</a></td>
           <td>${item.address}</td>
+          <td>${item.bank?.name}</td>
           <td>
             <button class="btn btn-sm btn-warning mx-1" type="button" onClick="openFormEdit('${item.id}');">
               <i class="fa fa-edit"></i>
@@ -269,6 +279,37 @@
         table.appendChild(row);
     });
   }
+
+  const getBanks = () => {
+    // spinner(true);
+    $.ajax({
+      type: "GET",
+      url: '/api/banks/',
+      dataType: 'json',
+      contentType: 'application/json',
+      success: (res) => {
+        console.log("-- banks ", res);
+        const { results: banks } = res;
+        currentBanks = banks;
+        $('#bank').empty();
+        $('#bank').html('<option value="null" disabled>-- Seleccione --</option>');
+        banks.forEach(item => {
+          $('#bank').append(
+              $('<option></option>')
+                  .val(item.id)
+                  .text(item.name)
+          );
+        });
+      },
+      error: (err) => {
+        console.error(err.responseJSON)
+      },
+      complete: (_) => {
+        // spinner(false);
+      }
+    });
+  }
+  getBanks();
 
   const setPagination = ({ count, next, previous }) => {
     const totalPaginate = count / 2;
@@ -305,19 +346,21 @@
         },
         gender: "required",
         person_type: "required",
+        bank: "required",
       },
       messages: {
-        full_name: "Ingresa un Nombre Completo",
-        birth_date: "Ingresa una fecha de Nacimiento",
-        email: "Ingresa un Correo Electrónico",
-        address: "Ingresa una Dirección",
+        full_name: "Ingresa un nombre completo",
+        birth_date: "Ingresa una fecha de nacimiento",
+        email: "Ingresa un correo electrónico",
+        address: "Ingresa una dirección",
         phone: {
-          required: "Ingresa un Número de Télefono",
+          required: "Ingresa un número de télefono",
           digits: "Debe ingresar sólo números",
           minlength: "Debe tener al menos 7 digitos"
         },
         gender: "Selecciona un Genero",
         person_type: "Selecciona un Tipo de Persona",
+        bank: "Selecciona un banco",
       },
       submitHandler: function(form) {
         submitForm();
@@ -337,6 +380,7 @@
     phone: $('#phone').val(),
     gender: $('#gender').val(),
     person_type: $('#person_type').val(),
+    bank_id: $('#bank').val()
   });
 
   const clearFieldsForm = () => {
@@ -349,6 +393,7 @@
     $('#phone').val("");
     $('#gender').val(null);
     $('#person_type').val(null);
+    $('#bank').val(null);
   }
 
   const submitForm = () => {
