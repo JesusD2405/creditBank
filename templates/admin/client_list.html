@@ -5,11 +5,15 @@
 {% endblock navbar %}
 
 {% block content %}
+<!-- Datatable -->
 <div class="container pt-5">
   <div class="card">
     <div class="card-header d-flex d-flex flex-column flex-md-row justify-content-between align-items-end">
-      <div>
+      <div class="d-flex">
         <h3>Listado de Clientes</h3>
+        <button id="btnFormLabel" type="submit" class="btn btn-sm btn-success mx-2" type="button" data-bs-toggle="modal" data-bs-target="#formClientModal">
+          <i class="fa fa-plus"></i>
+        </button>
       </div>
       <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12 d-flex align-items-end mt-2">
         <input type="text" name="search" id="search" class="form-control mb-2" placeholder="BUSCAR" onkeyup="filterBySearch()">
@@ -38,6 +42,76 @@
       <ul id="tablePaginate" class=" d-flex justify-content-center pagination">
       </ul>
     </nav>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="formClientModal" >
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header text-center p-2">
+        <div class="d-flex justify-content-center">
+          <h1 class="modal-title fs-5" id="formLabel"></h1>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-5 pt-3 pb-3">
+        <form id="formClient" class="row" name="formClient">
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="full_name" class="form-label fw-bold fs-6">Nombre y Apellido</label>
+            <input id="full_name" name="full_name" type="text" class="form-control fs-6" required>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="birth_date" class="form-label fw-bold fs-6">Fecha de Nacimiento</label>
+            <input id="birth_date" name="birth_date" type="date" class="form-control fs-6" required>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="nationality" class="form-label fw-bold fs-6">Nacionalidad</label>
+            <input id="nationality" name="nationality" type="text" class="form-control fs-6">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="address" class="form-label fw-bold fs-6">Dirección</label>
+            <input id="address" name="address" type="text" class="form-control fs-6">
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="email" class="form-label fw-bold fs-6">Correo Electrónico</label>
+            <input id="email" name="email" type="email" class="form-control fs-6" required>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="phone" class="form-label fw-bold fs-6">Teléfono</label>
+            <div class="d-flex">
+              <select name="phone_prefix" id="phone_prefix" class="form-select form-control" aria-label="-- Seleccione --" style="width: 100px;">
+                <option value="" disabled>-- Seleccione --</option>
+                <option value="+1">+1</option>
+                <option value="+34">+34</option>
+                <option value="+58">+58</option>
+                <option value="+507">+507</option>
+              </select>
+              <input id="phone" name="phone" type="phone" class="form-control fs-6">
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="gender" class="form-label fw-bold">Género</label>
+            <select name="gender" id="gender" class="form-select form-control mb-2" aria-label="-- Seleccione --" required>
+              <option value="" disabled>-- Seleccione --</option>
+              <option value="M">MASCULINO</option>
+              <option value="F">FEMENINO</option>
+            </select>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="person_type" class="form-label fw-bold">Tipo de Persona</label>
+            <select name="person_type" id="person_type" class="form-select form-control mb-2" aria-label="Seleccione un tipo de documento" required>
+              <option value="" disabled>-- Seleccione --</option>
+              <option value="N">NATURAL</option>
+              <option value="J">JURIDICO</option>
+            </select>
+          </div>
+          <div class="d-flex flex-row justify-content-around mt-5">
+            <button id="btnFormLabel" type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock content %}
 
@@ -113,5 +187,114 @@
   }
 
   getClients("/api/clients/");
+
+  // FORMULARIO
+  $(document).ready(function() {
+    $("form[name='formClient']").submit(function(e) {
+      e.preventDefault();
+    }).validate({
+      rules: {
+        full_name: "required",
+        birth_date: "required",
+        email: {
+          required: true,
+          email: true
+        },
+        address: "required",
+        phone: {
+          digits: true,
+          minlength: 7
+        },
+        gender: "required",
+        person_type: "required",
+      },
+      messages: {
+        full_name: "Ingresa un Nombre Completo",
+        birth_date: "Ingresa una fecha de Nacimiento",
+        email: "Ingresa un Correo Electrónico",
+        address: "Ingresa una Dirección",
+        phone: {
+          required: "Ingresa un Número de Télefono",
+          digits: "Debe ingresar sólo números",
+          minlength: "Debe tener al menos 7 digitos"
+        },
+        gender: "Selecciona un Genero",
+        person_type: "Selecciona un Tipo de Persona",
+      },
+      submitHandler: function(form) {
+        submitForm();
+        return;
+      }
+    });
+  });
+
+  const getFieldsValues = () => JSON.stringify({
+    csrfmiddlewaretoken: '{{ csrf_token }}',
+    full_name: $('#full_name').val(),
+    birth_date: $('#birth_date').val(),
+    nationality: $('#nationality').val(),
+    address: $('#address').val(),
+    email: $('#email').val(),
+    phone_prefix: $('#phone_prefix').val(),
+    phone: $('#phone').val(),
+    gender: $('#gender').val(),
+    person_type: $('#person_type').val(),
+  });
+
+  const clearFieldsForm = () => {
+    $('#full_name').val("");
+    $('#birth_date').val("");
+    $('#nationality').val("");
+    $('#address').val("");
+    $('#email').val("");
+    $('#phone_prefix').val(null);
+    $('#phone').val("");
+    $('#gender').val(null);
+    $('#person_type').val(null);
+  }
+
+  const submitForm = () => {
+    const data = getFieldsValues();
+    //spinner(true);
+    $.ajax({
+      type: "POST",
+      url: "/api/clients/",
+      dataType: 'json',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      },
+      data,
+      success: (res) => {
+        console.log("-- res ", res);
+        // alert(res.message);
+        Swal.fire({
+          title: 'Registro creado éxitosamente',
+          text: '',
+          icon: 'success',
+          timer: 3000
+        });
+        getClients("/api/clients/");
+        clearFieldsForm();
+        const myModalEl = document.getElementById('formClientModal');
+        const modal = bootstrap.Modal.getInstance(myModalEl)
+        modal.hide();
+      },
+      error: (err) => {
+        const { responseJSON: data } = err;
+        console.error(data.message);
+        Swal.fire({
+          title: '¡Uppss! ',
+          text: data.message,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      },
+      complete: (_) => {
+        // spinner(false);
+      }
+    });
+  }
+
 </script>
 {% endblock scripts %}
