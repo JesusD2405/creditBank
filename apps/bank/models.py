@@ -14,7 +14,7 @@ class Bank(BaseModel, SafeDeleteModel):
         ('G', 'Gobierno'),
     )
 
-    name = models.CharField(max_length=150, verbose_name='Descripción') 
+    name = models.CharField(max_length=150, verbose_name='Nombre') 
     bank_type = models.CharField(max_length=2, choices=BANK_TYPE, verbose_name='Tipo de Banco')
     address = models.CharField(max_length=255, verbose_name='Dirección', null=True, blank=True)
 
