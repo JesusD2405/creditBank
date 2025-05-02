@@ -19,8 +19,7 @@ def loginView(request):
         user = authenticate(request, username=request.data['username'],password=request.data['password'])
         if user:
             login(request, user)
-            # TODO: Redireccionar a la vista (por definir)
-            return redirect('')
+            return redirect('clients_list')
         message_error = '¡Usuario o Contraseña Inválida!'
         return Response({'message_error': message_error }, template_name= 'auth/login.html')
 
