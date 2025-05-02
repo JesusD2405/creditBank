@@ -8,8 +8,11 @@
 <div class="container pt-5">
   <div class="card">
     <div class="card-header d-flex d-flex flex-column flex-md-row justify-content-between align-items-end">
-      <div>
+      <div class="d-flex">
         <h3>Listado de Bancos</h3>
+        <button id="btnFormLabel" class="btn btn-sm btn-success mx-2" type="button" data-bs-toggle="modal" data-bs-target="#formBankModal">
+          <i class="fa fa-plus"></i>
+        </button>
       </div>
       <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12 d-flex align-items-end mt-2">
         <input type="text" name="search" id="search" class="form-control mb-2" placeholder="BUSCAR" onkeyup="filterBySearch()">
@@ -34,6 +37,43 @@
       </ul>
     </nav>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="formBankModal" >
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header text-center p-2">
+        <div class="d-flex justify-content-center">
+          <h1 class="modal-title fs-5" id="formLabel"></h1>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-5 pt-3 pb-3">
+        <form id="formBank" class="row" name="formBank">
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="bank_type" class="form-label fw-bold">Tipo de Banco</label>
+            <select name="bank_type" id="bank_type" class="form-select form-control mb-2" aria-label="-- Seleccione --" required>
+              <option value="" disabled>-- Seleccione --</option>
+              <option value="P">Privado</option>
+              <option value="P">Gobierno</option>
+            </select>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="name" class="form-label fw-bold fs-6">Nombre</label>
+            <input id="name" name="name" type="text" class="form-control fs-6" required>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mb-2">
+            <label for="address" class="form-label fw-bold fs-6">Dirección</label>
+            <input id="address" name="address" type="text" class="form-control fs-6" required>
+          </div>
+          <div class="d-flex flex-row justify-content-around mt-5">
+            <button id="btnFormLabel" type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
 
 {% block scripts %}
@@ -42,6 +82,17 @@
   const BANK_TYPE = {
     "P": "Privado",
     "G": "Gobierno",
+  }
+
+  const showModal = (openModal) => {
+    const myModalEl = document.getElementById('formBankModal');
+    let modal = bootstrap.Modal.getInstance(myModalEl) || new bootstrap.Modal(myModalEl);
+
+    if (openModal) {
+      modal.show();  
+    } else {
+      modal.hide();
+    }
   }
 
   const getBanks = (url) => {
@@ -98,5 +149,81 @@
   }
 
   getBanks("/api/banks/");
+
+  // FORMULARIO
+  $(document).ready(function() {
+    $("form[name='formBank']").submit(function(e) {
+      e.preventDefault();
+    }).validate({
+      rules: {
+        bank_type: "required",
+        name: "required",
+        address: "required",
+      },
+      messages: {
+        bank_type: "Selecciona un tipo de banco",
+        name: "Ingresa un nombre",
+        address: "Ingresa una descripción",
+      },
+      submitHandler: function(form) {
+        submitForm();
+        return;
+      }
+    });
+  });
+
+  const getFieldsValues = () => JSON.stringify({
+    csrfmiddlewaretoken: '{{ csrf_token }}',
+    bank_type: $('#bank_type').val(),
+    name: $('#name').val(),
+    address: $('#address').val(),
+  });
+
+  const clearFieldsForm = () => {
+    $('#bank_type').val(null);
+    $('#name').val("");
+    $('#address').val("");
+  }
+
+  const submitForm = () => {
+    const data = getFieldsValues();
+    //spinner(true);
+    $.ajax({
+      type: 'POST',
+      url: '/api/banks/',
+      dataType: 'json',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      },
+      data,
+      success: (res) => {
+        console.log("-- res ", res);
+        // alert(res.message);
+        Swal.fire({
+          title: `Registro creado éxitosamente`,
+          text: '',
+          icon: 'success',
+          timer: 3000
+        });
+        getBanks("/api/banks/");
+        showModal(false);
+        clearFieldsForm();
+      },
+      error: (err) => {
+        const { responseJSON: data } = err;
+        console.error(data.message);
+        Swal.fire({
+          title: '¡Uppss! ',
+          text: data.message,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      },
+      complete: (_) => {
+        // spinner(false);
+      }
+    });
+  }
 </script>
 {% endblock scripts %}
